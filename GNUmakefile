@@ -312,6 +312,9 @@ endif
 ifeq ($(RENDERTYPE),WIN)
     engine_objs += winlayer.cpp rawinput.cpp
 endif
+ifeq ($(RENDERTYPE),PSP)
+    engine_objs += psplayer.cpp
+endif
 
 ifneq ($(USE_LIBVPX),0)
     engine_objs += animvpx.cpp
@@ -369,10 +372,16 @@ ifeq ($(PLATFORM),WINDOWS)
 endif
 
 ifeq ($(MIXERTYPE),SDL)
-    ifeq (,$(filter $(PLATFORM),DARWIN WINDOWS WII))
+    ifeq (,$(filter $(PLATFORM),DARWIN WINDOWS WII PSP))
         audiolib_cflags += `$(PKG_CONFIG) --cflags vorbis`
     endif
     audiolib_objs += driver_sdl.cpp
+endif
+
+ifeq ($(PLATFORM),PSP)
+    ifeq ($(MIXERTYPE),PSP)
+        audiolib_objs += driver_psp.cpp
+    endif
 endif
 
 ifneq (0,$(HAVE_XMP))
@@ -687,6 +696,10 @@ ifeq ($(PLATFORM),WII)
     LIBS += -lvorbisidec
 endif
 
+#ifeq ($(PLATFORM),PSP)
+#    LIBS += -lvorbisidec -logg
+#endif
+
 ifeq (11,$(HAVE_GTK2)$(STARTUP_WINDOW))
     duke3d_game_objs += startgtk.game.cpp
     duke3d_game_gen_objs += game_banner.c
@@ -698,6 +711,9 @@ ifeq ($(RENDERTYPE),SDL)
 endif
 ifeq ($(MIXERTYPE),SDL)
     duke3d_common_midi_objs := sdlmusic.cpp
+endif
+ifeq ($(MIXERTYPE),PSP)
+    duke3d_common_midi_objs := pspmusic.cpp
 endif
 
 
@@ -824,6 +840,7 @@ ifeq ($(PLATFORM),WINDOWS)
 endif
 
 
+
 #### Final setup
 
 COMPILERFLAGS += -I$(engine_inc) -I$(mact_inc) -I$(audiolib_inc) -I$(enet_inc) -I$(glad_inc)
@@ -914,8 +931,15 @@ ifneq ($$(ELF2DOL),)
 	$$(ELF2DOL) $$@ $$($1_$2)$$(DOLSUFFIX)
 endif
 endif
+ifeq ($$(PLATFORM),PSP)
+	psp-fixup-imports $($1_$2)$$(EXESUFFIX)
+	psp-prxgen $($1_$2)$$(EXESUFFIX) $($1_$2).prx
+	mksfoex -d MEMSIZE=1 EDuke32 PARAM.SFO
+	pack-pbp EBOOT.PBP PARAM.SFO NULL NULL NULL NULL NULL $($1_$2).prx NULL
+else
 ifneq ($$(STRIP),)
 	$$(STRIP) $$@ $$($1_$2_stripflags)
+endif
 endif
 ifeq ($$(PLATFORM),DARWIN)
 	cp -RPf "platform/Apple/bundles/$$($1_$2_proper).app" "./"

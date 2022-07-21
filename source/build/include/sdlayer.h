@@ -92,10 +92,12 @@ static inline void idle_waitevent(void)
 
 static inline void idle(void)
 {
-#ifndef _WIN32
-    usleep(1000);
-#else
+#if defined(_WIN32)
     Sleep(1);
+#elif defined(__PSP__)
+    sceKernelDelayThread(1000);
+#else
+    usleep(1000);
 #endif
 }
 

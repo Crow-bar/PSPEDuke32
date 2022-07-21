@@ -370,7 +370,7 @@ defined __x86_64__ || defined __amd64__ || defined _M_X64 || defined _M_IA64 || 
 #  define B_BIG_ENDIAN    1
 # endif
 
-#elif defined(_WIN32) || defined(SKYOS) || defined(__SYLLABLE__)
+#elif defined(_WIN32) || defined(SKYOS) || defined(__SYLLABLE__) || defined(__PSP__)
 # define B_LITTLE_ENDIAN 1
 # define B_BIG_ENDIAN    0
 #endif
@@ -445,6 +445,10 @@ defined __x86_64__ || defined __amd64__ || defined _M_X64 || defined _M_IA64 || 
 #else
 # include <unistd.h>
 #endif
+#endif
+
+#ifdef __PSP__
+#include <pspkernel.h>
 #endif
 
 
@@ -965,7 +969,7 @@ static FORCE_INLINE CONSTEXPR uint64_t B_PASS64(uint64_t const x) { return x; }
 
 // TODO: Determine when, if ever, we should use the bit-shift-and-mask variants
 // due to alignment issues or performance gains.
-#if 1
+#ifndef __PSP__
 static FORCE_INLINE void B_BUF16(void * const buf, uint16_t const x) { *(uint16_t *) buf = x; }
 static FORCE_INLINE void B_BUF32(void * const buf, uint32_t const x) { *(uint32_t *) buf = x; }
 static FORCE_INLINE void B_BUF64(void * const buf, uint64_t const x) { *(uint64_t *) buf = x; }

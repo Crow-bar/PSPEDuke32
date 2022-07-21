@@ -455,7 +455,11 @@ void videoShowFrame(int32_t w)
     }
 
     if (SDL_MUSTLOCK(sdl_surface)) SDL_LockSurface(sdl_surface);
+#ifdef __PSP__
+    softsurface_blitBuffer((uint32_t*) sdl_surface->pixels, sdl_surface->format->BitsPerPixel, /*sdl_surface->pitch*/512);
+#else
     softsurface_blitBuffer((uint32_t*) sdl_surface->pixels, sdl_surface->format->BitsPerPixel);
+#endif
     if (SDL_MUSTLOCK(sdl_surface)) SDL_UnlockSurface(sdl_surface);
 
     SDL_Flip(sdl_surface);

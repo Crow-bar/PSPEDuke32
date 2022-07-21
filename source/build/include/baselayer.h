@@ -258,6 +258,12 @@ void (*timerSetCallback(void (*callback)(void)))(void);
 
 #if defined RENDERTYPESDL && !defined LUNATIC
 static FORCE_INLINE uint32_t timerGetTicks(void) { return (uint32_t)SDL_GetTicks(); }
+#elif defined RENDERTYPEPSP && !defined LUNATIC
+static FORCE_INLINE uint32_t timerGetTicks(void) {
+    u64 current_ticks;
+    sceRtcGetCurrentTick(&current_ticks);
+    return (uint32_t)current_ticks / 1000;
+}
 #else
 uint32_t timerGetTicks(void);
 #endif

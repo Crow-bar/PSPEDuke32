@@ -2748,6 +2748,18 @@ int32_t kzfindfile(char *filnam)
                 if ((findata.cFileName[0] == '.') && (!findata.cFileName[1])) continue;
             strcpy(&filnam[i],findata.cFileName);
             if (findata.dwFileAttributes&FILE_ATTRIBUTE_DIRECTORY) strcat(&filnam[i],"\\");
+#elif defined(__PSP__)
+            if ((findata = readdir(hfind)) == NULL)
+                { closedir(hfind); hfind = NULL; if (!kzhashbuf) return 0; srchstat = 2; break; }
+            i = wildstpathleng;
+            if (FIO_SO_ISDIR(findata->d_stat.st_mode))
+                { if (findata->d_name[0] == '.' && !findata->d_name[1]) continue; } //skip .
+            else if ((FIO_SO_ISREG(findata->d_stat.st_mode)) || (FIO_SO_ISLNK(findata->d_stat.st_mode)))
+                { if (findata->d_name[0] == '.') continue; } //skip hidden (dot) files
+            else continue; //skip devices and fifos and such
+            if (!wildmatch(findata->d_name,&newildst[wildstpathleng])) continue;
+            strcpy(&filnam[i],findata->d_name);
+            if (FIO_SO_ISDIR(findata->d_stat.st_mode)) strcat(&filnam[i],"/");
 #else
             if ((findata = readdir(hfind)) == NULL)
                 { closedir(hfind); hfind = NULL; if (!kzhashbuf) return 0; srchstat = 2; break; }

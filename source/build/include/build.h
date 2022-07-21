@@ -50,7 +50,7 @@ enum rendmode_t {
 #define MAXWALLSV7 8192
 #define MAXSPRITESV7 4096
 
-#if !defined GEKKO && !defined __OPENDINGUX__
+#if !defined GEKKO && !defined __OPENDINGUX__ && !defined __PSP__
 # define MAXSECTORS MAXSECTORSV8
 # define MAXWALLS MAXWALLSV8
 # define MAXSPRITES MAXSPRITESV8
@@ -71,6 +71,9 @@ enum rendmode_t {
 #ifdef GEKKO
 #  define MAXXDIM 860
 #  define MAXYDIM 490
+# elif defined __PSP__
+#  define MAXXDIM 480
+#  define MAXYDIM 272
 # else
 #  define MAXXDIM 320
 #  define MAXYDIM 200

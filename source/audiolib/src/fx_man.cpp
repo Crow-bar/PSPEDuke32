@@ -53,6 +53,8 @@ int32_t FX_Init(int32_t numvoices, int32_t numchannels, unsigned mixrate, void *
     int SoundCard = ASS_DirectSound;
 #elif defined MIXERTYPESDL
     int SoundCard = ASS_SDL;
+#elif defined MIXERTYPEPSP
+    int SoundCard = ASS_PSP;
 #else
 #warning No sound driver selected!
     int SoundCard = ASS_NoSound;

@@ -9,9 +9,12 @@
 
 int32_t mutex_init(mutex_t *mutex)
 {
-#ifdef RENDERTYPEWIN
+#if defined(RENDERTYPEWIN)
     *mutex = CreateMutex(0, FALSE, 0);
     return (*mutex == 0);
+#elif defined(RENDERTYPEPSP)
+    *mutex = NULL;
+    return -1;
 #else
     if (mutex)
     {
@@ -25,8 +28,10 @@ int32_t mutex_init(mutex_t *mutex)
 
 int32_t mutex_lock(mutex_t *mutex)
 {
-#ifdef RENDERTYPEWIN
+#if defined(RENDERTYPEWIN)
     return (WaitForSingleObject(*mutex, INFINITE) == WAIT_FAILED);
+#elif defined(RENDERTYPEPSP)
+    return -1;
 #else
     return SDL_LockMutex(*mutex);
 #endif
@@ -34,8 +39,10 @@ int32_t mutex_lock(mutex_t *mutex)
 
 int32_t mutex_unlock(mutex_t *mutex)
 {
-#ifdef RENDERTYPEWIN
+#if defined(RENDERTYPEWIN)
     return (ReleaseMutex(*mutex) == 0);
+#elif defined(RENDERTYPEPSP)
+    return -1;
 #else
     return SDL_UnlockMutex(*mutex);
 #endif

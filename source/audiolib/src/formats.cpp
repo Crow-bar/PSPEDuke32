@@ -212,7 +212,11 @@ end_of_data:
 
         case 9 :
             // New sound data block
+#ifdef __PSP__
+            samplespeed = B_LITTLE32(B_UNBUF32(ptr));
+#else
             samplespeed = B_LITTLE32(*(uint32_t const *)ptr);
+#endif
             BitsPerSample = (unsigned)*(ptr + 4);
             Channels = (unsigned)*(ptr + 5);
             Format = (unsigned)B_LITTLE16(*(uint16_t const *)(ptr + 6));

@@ -3,8 +3,10 @@
 
 /* Mutual exclusion mechanism wrappers for the different platforms */
 
-#ifdef RENDERTYPEWIN
+#if defined(RENDERTYPEWIN)
 # include "windows_inc.h"
+#elif defined(RENDERTYPEPSP)
+# include "psp_inc.h"
 #else
 # define SDL_MAIN_HANDLED
 # include "sdl_inc.h"
@@ -14,8 +16,10 @@
 extern "C" {
 #endif
 
-#ifdef RENDERTYPEWIN
+#if defined(RENDERTYPEWIN)
 typedef HANDLE mutex_t;
+#elif defined(RENDERTYPEPSP)
+typedef SceUID mutex_t;
 #else
 /* PK: I don't like pointer typedefs, but SDL_CreateMutex() _returns_ one,
  *     so we're out of luck with our interface. */

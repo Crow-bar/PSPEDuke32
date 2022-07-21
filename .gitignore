@@ -8,6 +8,7 @@ voidsw-editor
 kenbuild
 kenbuild-editor
 apps/
+test/
 *.exe
 /*.dll
 *.dylib
@@ -18,6 +19,9 @@ apps/
 *.x64
 *.ppc
 *.app
+*.prx
+*.pbp
+*.sfo
 
 *.log
 *.cache
@@ -29,6 +33,7 @@ textures
 /platform/Windows/*.map
 *.pdb
 .vs/
+.vscode/
 *.VC.db
 *.VC.opendb
 *.sym

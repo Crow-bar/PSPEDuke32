@@ -46,7 +46,7 @@ extern "C" {
 #define USERQUOTE_LEFTOFFSET    5
 #define USERQUOTE_RIGHTOFFSET   14
 
-#if defined(GEKKO) || defined(__OPENDINGUX__)
+#if defined(GEKKO) || defined(__OPENDINGUX__) || defined(__PSP__)
 # define VIEWSCREENFACTOR 0
 #elif defined(__ANDROID__)
 # define VIEWSCREENFACTOR 1

@@ -58,14 +58,16 @@ int32_t I_AdvanceTrigger(void)
     return (
             KB_KeyPressed(sc_kpad_Enter) ||
             KB_KeyPressed(sc_Enter) ||
-#if !defined EDUKE32_TOUCH_DEVICES
+#if !defined EDUKE32_TOUCH_DEVICES && !defined(__PSP__)
             MOUSEINACTIVECONDITIONAL(MOUSE_GetButtons()&LEFT_MOUSE) ||
 #endif
 #if defined(GEKKO)
             MOUSEINACTIVECONDITIONAL(JOYSTICK_GetButtons()&WII_A)
+#elif defined(__PSP__)
+            MOUSEINACTIVECONDITIONAL(JOYSTICK_GetButtons()&PSP_CROSS)
 #else
             BUTTON(gamefunc_Open) ||
-# if !defined EDUKE32_TOUCH_DEVICES
+# if !defined(EDUKE32_TOUCH_DEVICES)
             MOUSEINACTIVECONDITIONAL(BUTTON(gamefunc_Fire))
 # else
             BUTTON(gamefunc_Fire)
@@ -82,6 +84,8 @@ void I_AdvanceTriggerClear(void)
     MOUSE_ClearButton(LEFT_MOUSE);
 #if defined(GEKKO)
     JOYSTICK_ClearButton(WII_A);
+#elif defined(__PSP__)
+    JOYSTICK_ClearButton(PSP_CROSS);
 #else
     CONTROL_ClearButton(gamefunc_Open);
     CONTROL_ClearButton(gamefunc_Fire);
@@ -93,9 +97,12 @@ int32_t I_ReturnTrigger(void)
     return (
             KB_KeyPressed(sc_Escape) ||
             (MOUSE_GetButtons()&RIGHT_MOUSE) ||
-            BUTTON(gamefunc_Crouch)
 #if defined(GEKKO)
-            || (JOYSTICK_GetButtons()&(WII_B|WII_HOME))
+            (JOYSTICK_GetButtons()&(WII_B|WII_HOME))
+#elif defined(__PSP__)
+            (JOYSTICK_GetButtons()&(PSP_CIRCLE|PSP_START))
+#else
+            BUTTON(gamefunc_Crouch)
 #endif
             );
 }
@@ -105,10 +112,14 @@ void I_ReturnTriggerClear(void)
     KB_FlushKeyboardQueue();
     KB_ClearKeyDown(sc_Escape);
     MOUSE_ClearButton(RIGHT_MOUSE);
-    CONTROL_ClearButton(gamefunc_Crouch);
 #if defined(GEKKO)
     JOYSTICK_ClearButton(WII_B);
     JOYSTICK_ClearButton(WII_HOME);
+#elif defined(__PSP__)
+    JOYSTICK_ClearButton(PSP_CIRCLE);
+    JOYSTICK_ClearButton(PSP_START);
+#else
+    CONTROL_ClearButton(gamefunc_Crouch);
 #endif
 }
 
@@ -119,6 +130,8 @@ int32_t I_EscapeTrigger(void)
             KB_KeyPressed(sc_Escape)
 #if defined(GEKKO)
             || (JOYSTICK_GetButtons()&WII_HOME)
+#elif defined(__PSP__)
+            || (JOYSTICK_GetButtons()&PSP_START)
 #endif
             );
 }
@@ -129,6 +142,8 @@ void I_EscapeTriggerClear(void)
     KB_ClearKeyDown(sc_Escape);
 #if defined(GEKKO)
     JOYSTICK_ClearButton(WII_HOME);
+#elif defined(__PSP__)
+    JOYSTICK_ClearButton(PSP_START);
 #endif
 }
 
@@ -139,7 +154,11 @@ int32_t I_MenuUp(void)
             KB_KeyPressed(sc_UpArrow) ||
             KB_KeyPressed(sc_kpad_8) ||
             (MOUSE_GetButtons()&WHEELUP_MOUSE) ||
+#if defined(__PSP__)
+            (JOYSTICK_GetButtons()&PSP_UP) ||
+#else
             BUTTON(gamefunc_Move_Forward) ||
+#endif
             (JOYSTICK_GetHat(0)&HAT_UP)
             );
 }
@@ -149,7 +168,11 @@ void I_MenuUpClear(void)
     KB_ClearKeyDown(sc_UpArrow);
     KB_ClearKeyDown(sc_kpad_8);
     MOUSE_ClearButton(WHEELUP_MOUSE);
+#if defined(__PSP__)
+    JOYSTICK_ClearButton(PSP_UP);
+#else
     CONTROL_ClearButton(gamefunc_Move_Forward);
+#endif
     JOYSTICK_ClearHat(0);
 }
 
@@ -160,7 +183,11 @@ int32_t I_MenuDown(void)
             KB_KeyPressed(sc_DownArrow) ||
             KB_KeyPressed(sc_kpad_2) ||
             (MOUSE_GetButtons()&WHEELDOWN_MOUSE) ||
+#if defined(__PSP__)
+            (JOYSTICK_GetButtons()&PSP_DOWN) ||
+#else
             BUTTON(gamefunc_Move_Backward) ||
+#endif
             (JOYSTICK_GetHat(0)&HAT_DOWN)
             );
 }
@@ -171,7 +198,11 @@ void I_MenuDownClear(void)
     KB_ClearKeyDown(sc_kpad_2);
     KB_ClearKeyDown(sc_PgDn);
     MOUSE_ClearButton(WHEELDOWN_MOUSE);
+#if defined(__PSP__)
+    JOYSTICK_ClearButton(PSP_DOWN);
+#else
     CONTROL_ClearButton(gamefunc_Move_Backward);
+#endif
     JOYSTICK_ClearHat(0);
 }
 
@@ -182,8 +213,12 @@ int32_t I_MenuLeft(void)
             KB_KeyPressed(sc_LeftArrow) ||
             KB_KeyPressed(sc_kpad_4) ||
             (SHIFTS_IS_PRESSED && KB_KeyPressed(sc_Tab)) ||
+#if defined(__PSP__)
+            (JOYSTICK_GetButtons()&PSP_LEFT) ||
+#else
             BUTTON(gamefunc_Turn_Left) ||
             BUTTON(gamefunc_Strafe_Left) ||
+#endif
             (JOYSTICK_GetHat(0)&HAT_LEFT)
             );
 }
@@ -193,8 +228,12 @@ void I_MenuLeftClear(void)
     KB_ClearKeyDown(sc_LeftArrow);
     KB_ClearKeyDown(sc_kpad_4);
     KB_ClearKeyDown(sc_Tab);
+#if defined(__PSP__)
+    JOYSTICK_ClearButton(PSP_LEFT);
+#else
     CONTROL_ClearButton(gamefunc_Turn_Left);
     CONTROL_ClearButton(gamefunc_Strafe_Left);
+#endif
     JOYSTICK_ClearHat(0);
 }
 
@@ -205,8 +244,12 @@ int32_t I_MenuRight(void)
             KB_KeyPressed(sc_RightArrow) ||
             KB_KeyPressed(sc_kpad_6) ||
             (!SHIFTS_IS_PRESSED && KB_KeyPressed(sc_Tab)) ||
+#if defined(__PSP__)
+            (JOYSTICK_GetButtons()&PSP_RIGHT) ||
+#else
             BUTTON(gamefunc_Turn_Right) ||
             BUTTON(gamefunc_Strafe_Right) ||
+#endif
             (MOUSE_GetButtons()&MIDDLE_MOUSE) ||
             (JOYSTICK_GetHat(0)&HAT_RIGHT)
             );
@@ -217,8 +260,12 @@ void I_MenuRightClear(void)
     KB_ClearKeyDown(sc_RightArrow);
     KB_ClearKeyDown(sc_kpad_6);
     KB_ClearKeyDown(sc_Tab);
+#if defined(__PSP__)
+    JOYSTICK_ClearButton(PSP_RIGHT);
+#else
     CONTROL_ClearButton(gamefunc_Turn_Right);
     CONTROL_ClearButton(gamefunc_Strafe_Right);
+#endif
     MOUSE_ClearButton(MIDDLE_MOUSE);
     JOYSTICK_ClearHat(0);
 }
@@ -263,7 +310,7 @@ void I_PanelDownClear(void)
 int32_t I_SliderLeft(void)
 {
     return (
-#if !defined EDUKE32_TOUCH_DEVICES
+#if !defined(EDUKE32_TOUCH_DEVICES) && !defined(__PSP__)
             MOUSEINACTIVECONDITIONAL((MOUSE_GetButtons()&LEFT_MOUSE) && (MOUSE_GetButtons()&WHEELUP_MOUSE)) ||
 #endif
             I_MenuLeft()
@@ -280,7 +327,7 @@ void I_SliderLeftClear(void)
 int32_t I_SliderRight(void)
 {
     return (
-#if !defined EDUKE32_TOUCH_DEVICES
+#if !defined(EDUKE32_TOUCH_DEVICES) && !defined(__PSP__)
             MOUSEINACTIVECONDITIONAL((MOUSE_GetButtons()&LEFT_MOUSE) && (MOUSE_GetButtons()&WHEELDOWN_MOUSE)) ||
 #endif
             I_MenuRight()

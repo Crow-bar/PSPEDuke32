@@ -31,6 +31,8 @@
 # include "driver_directsound.h"
 #elif defined MIXERTYPESDL
 # include "driver_sdl.h"
+#elif defined MIXERTYPEPSP
+# include "driver_psp.h"
 #endif
 
 int32_t ASS_SoundDriver = -1;
@@ -67,6 +69,11 @@ static struct
     {
     SDLDrv_GetError, SDLDrv_ErrorString, SDLDrv_PCM_Init, SDLDrv_PCM_Shutdown,
     SDLDrv_PCM_BeginPlayback, SDLDrv_PCM_StopPlayback, SDLDrv_PCM_Lock, SDLDrv_PCM_Unlock,
+    },
+#elif defined MIXERTYPEPSP
+    {
+    PSPDrv_GetError, PSPDrv_ErrorString, PSPDrv_PCM_Init, PSPDrv_PCM_Shutdown,
+    PSPDrv_PCM_BeginPlayback, PSPDrv_PCM_StopPlayback, PSPDrv_PCM_Lock, PSPDrv_PCM_Unlock,
     },
 #endif
 };

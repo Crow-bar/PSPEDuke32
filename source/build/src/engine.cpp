@@ -45,11 +45,11 @@ L_State g_engState;
 //////////
 // Compilation switches for optional/extended engine features
 
-#if !defined(__arm__) && !defined(GEKKO)
+#if !defined(__arm__) && !defined(GEKKO) && !defined(__PSP__)
 # define HIGH_PRECISION_SPRITE
 #endif
 
-#if !defined EDUKE32_TOUCH_DEVICES && !defined GEKKO && !defined __OPENDINGUX__
+#if !defined EDUKE32_TOUCH_DEVICES && !defined GEKKO && !defined __OPENDINGUX__ && !defined __PSP__
 // Handle absolute z difference of floor/ceiling to camera >= 1<<24.
 // Also: higher precision view-relative x and y for drawvox().
 # define CLASSIC_Z_DIFF_64
@@ -7558,7 +7558,7 @@ psky_t * tileSetupSky(int32_t const tilenum)
 // Exported Engine Functions
 //
 
-#if !defined _WIN32 && defined DEBUGGINGAIDS && !defined GEKKO
+#if !defined _WIN32 && defined DEBUGGINGAIDS && !defined GEKKO && !defined __PSP__
 #ifdef GEKKO
 #define __rtems__
 #define _POSIX_REALTIME_SIGNALS
@@ -7728,7 +7728,7 @@ int32_t engineInit(void)
 {
     int32_t i, j;
 
-#if !defined _WIN32 && defined DEBUGGINGAIDS && !defined GEKKO
+#if !defined _WIN32 && defined DEBUGGINGAIDS && !defined GEKKO && !defined __PSP__
     struct sigaction sigact, oldact;
     memset(&sigact, 0, sizeof(sigact));
     sigact.sa_sigaction = &sighandler;
@@ -9879,7 +9879,7 @@ static void videoAllocateBuffers(void)
     ysavecnt = YSAVES;
     nodesperline = tabledivide32_noinline(YSAVES, ydim);
 
-#ifdef RENDERTYPESDL
+#if defined(RENDERTYPESDL) || defined(RENDERTYPEPSP)
     if (videoGetRenderMode() == REND_CLASSIC)
     {
 # ifdef USE_OPENGL

@@ -82,6 +82,9 @@ endif
 ifeq ($(PLATFORM),WII)
     EXESUFFIX := .elf
 endif
+ifeq ($(PLATFORM),PSP)
+    EXESUFFIX := .elf
+endif
 ifeq ($(PLATFORM),SKYOS)
     EXESUFFIX := .app
 endif
@@ -172,6 +175,10 @@ ifeq ($(PLATFORM),WII)
     CCFULLPATH = $(DEVKITPPC)/bin/$(CC)
 endif
 
+ifeq ($(PLATFORM),PSP)
+    CROSS := psp-
+endif
+
 CC := $(CROSS)gcc$(CROSS_SUFFIX)
 CXX := $(CROSS)g++$(CROSS_SUFFIX)
 
@@ -184,6 +191,10 @@ COBJC := $(CC) -x objective-c
 COBJCXX := $(CXX) -x objective-c++
 L_CC := $(CC)
 L_CXX := $(CXX)
+
+ifeq ($(PLATFORM),PSP)
+L_CXX := $(CC)
+endif
 
 AR := $(CROSS)ar$(CROSS_SUFFIX)
 RC := $(CROSS)windres$(CROSS_SUFFIX)
@@ -283,6 +294,8 @@ ifeq ($(PLATFORM),WINDOWS)
     endif
 else ifeq ($(PLATFORM),WII)
     IMPLICIT_ARCH := ppc
+else ifeq ($(PLATFORM),PSP)
+    IMPLICIT_ARCH := mips
 else
     ifneq ($(ARCH),)
         override ARCH := $(subst i486,i386,$(subst i586,i386,$(subst i686,i386,$(strip $(ARCH)))))
@@ -384,6 +397,16 @@ else ifeq ($(PLATFORM),WII)
     override HAVE_GTK2 := 0
     override HAVE_FLAC := 0
     SDL_TARGET := 1
+else ifeq ($(PLATFORM),PSP)
+    override RENDERTYPE := PSP
+    override MIXERTYPE := PSP
+    override USE_OPENGL := 0
+    override NETCODE := 0
+    override HAVE_GTK2 := 0
+    override HAVE_VORBIS := 0
+    override HAVE_FLAC := 0
+    override HAVE_XMP := 0
+    SDL_TARGET := 2
 else ifeq ($(PLATFORM),$(filter $(PLATFORM),DINGOO GCW QNX SUNOS SYLLABLE))
     override USE_OPENGL := 0
     override NOASM := 1
@@ -462,6 +485,9 @@ ifeq (0,$(CLANG))
                 override LTO := 0
             endif
         endif
+    endif
+    ifeq ($(PLATFORM),PSP)
+        override LTO := 0
     endif
 endif
 
@@ -554,6 +580,14 @@ else ifeq ($(PLATFORM),WII)
     # -msdata=eabiexport
     COMPILERFLAGS += -DGEKKO -D__POWERPC__ -I$(LIBOGC_INC)
     LIBDIRS += -L$(LIBOGC_LIB)
+else ifeq ($(PLATFORM),PSP)
+    LIBPSP_INC := $(PSPDEV)/psp/sdk/include
+    LIBPSP_LIB := $(PSPDEV)/psp/sdk/lib
+
+    #COMMONFLAGS += -g -ffast-math -fpermissive
+    LINKERFLAGS += -specs=$(LIBPSP_LIB)/prxspecs -Wl,-q,-T$(LIBPSP_LIB)/linkfile.prx
+    COMPILERFLAGS += -G0 -D_PSP_FW_VERSION=660 -D__PSP__ -I$(LIBPSP_INC)
+    LIBDIRS += -L$(LIBPSP_LIB)
 else ifeq ($(PLATFORM),$(filter $(PLATFORM),DINGOO GCW))
     COMPILERFLAGS += -D__OPENDINGUX__
 else ifeq ($(PLATFORM),SKYOS)
@@ -658,6 +692,9 @@ endif
 ifneq (0,$(PROFILER))
     ifneq ($(PLATFORM),DARWIN)
         LIBS += -lprofiler
+    endif
+    ifneq ($(PLATFORM),PSP)
+        LIBS += -lpspprof
     endif
     COMMONFLAGS += -pg
 endif
@@ -890,6 +927,8 @@ ifeq ($(RENDERTYPE),SDL)
     else ifeq ($(PLATFORM),SKYOS)
         COMPILERFLAGS += -I/boot/programs/sdk/include/sdl
         SDLCONFIG :=
+    else ifeq ($(PLATFORM),PSP)
+        SDLCONFIG :=
     endif
 
     ifneq ($(strip $(SDLCONFIG)),)
@@ -965,11 +1004,22 @@ else ifeq ($(PLATFORM),SUNOS)
     LIBS += -lsocket -lnsl
 else ifeq ($(PLATFORM),WII)
     LIBS += -laesnd_tueidj -lfat -lwiiuse -lbte -lwiikeyboard -logc
+else ifeq ($(PLATFORM),PSP)
+    ifeq ($(RENDERTYPE),SDL)
+        LIBS += -l$(SDLNAME)main
+        LIBS += -lGL -lGLU -lglut -lz -lmikmod -lpspirkeyb -lpspgum_vfpu -lpspgu
+        LIBS += -lpspvfpu -lpspvram -lpsphprm -lpsputility
+    endif
+    LIBS += -lpspdisplay
+    LIBS += -lpspaudio
+    LIBS += -lpspdebug -lpspge
+    LIBS += -lpsppower -lpsprtc -lpspctrl -lpspsdk -lc -lpspuser
+    LIBS += -lpspnet -lpspnet_inet -lpspnet_apctl -lpspnet_resolver
 else ifeq ($(SUBPLATFORM),LINUX)
     LIBS += -lrt
 endif
 
-ifeq (,$(filter $(PLATFORM),WINDOWS WII))
+ifeq (,$(filter $(PLATFORM),WINDOWS WII PSP))
     ifneq ($(PLATFORM),BSD)
         LIBS += -ldl
     endif

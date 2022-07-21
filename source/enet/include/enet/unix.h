@@ -14,6 +14,9 @@
 #include <sys/socket.h>
 #include <netinet/in.h>
 #endif
+#if defined(__PSP__)
+#include <sys/select.h>
+#endif
 #include <unistd.h>
 
 #ifdef MSG_MAXIOVLEN

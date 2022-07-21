@@ -261,7 +261,11 @@ int32_t g_groupFileHandle;
 
 void G_ExtPreInit(int32_t argc,char const * const * argv)
 {
+#ifdef __PSP__
+    g_useCwd = 1; // allways
+#else
     g_useCwd = G_CheckCmdSwitch(argc, argv, "-usecwd");
+#endif
 
 #ifdef _WIN32
     GetModuleFileName(NULL,g_rootDir,BMAX_PATH);
@@ -1177,11 +1181,11 @@ success:
     return fp;
 }
 
+#endif
+
 void Duke_CommonCleanup(void)
 {
     DO_FREE_AND_NULL(g_grpNamePtr);
     DO_FREE_AND_NULL(g_scriptNamePtr);
     DO_FREE_AND_NULL(g_rtsNamePtr);
 }
-
-#endif

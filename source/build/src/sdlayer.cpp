@@ -1,6 +1,5 @@
 // SDL interface layer for the Build Engine
 // Use SDL 1.2 or 2.0 from http://www.libsdl.org
-
 #include <signal.h>
 
 #include "a.h"
@@ -39,6 +38,10 @@
 #endif
 
 #include "vfs.h"
+
+#ifdef __PSP__
+PSP_HEAP_SIZE_KB(-1 * 1024);
+#endif
 
 #if SDL_MAJOR_VERSION != 1
 static SDL_version linked;
@@ -103,7 +106,7 @@ static float lastvidgcb[3];
 #include "sdlkeytrans.cpp"
 
 static SDL_Surface *appicon = NULL;
-#if !defined __APPLE__ && !defined EDUKE32_TOUCH_DEVICES
+#if !defined __APPLE__ && !defined EDUKE32_TOUCH_DEVICES && !defined __PSP__
 static SDL_Surface *loadappicon(void);
 #endif
 
@@ -263,7 +266,7 @@ void wm_setapptitle(const char *name)
     if (name != apptitle)
         Bstrncpyz(apptitle, name, sizeof(apptitle));
 
-#if !defined(__APPLE__)
+#if !defined(__APPLE__) && !defined(__PSP__)
     if (!appicon)
         appicon = loadappicon();
 #endif
@@ -305,7 +308,7 @@ void wm_setapptitle(const char *name)
 //
 
 /* XXX: libexecinfo could be used on systems without gnu libc. */
-#if !defined _WIN32 && defined __GNUC__ && !defined __OpenBSD__ && !(defined __APPLE__ && defined __BIG_ENDIAN__) && !defined GEKKO && !defined EDUKE32_TOUCH_DEVICES && !defined __OPENDINGUX__
+#if !defined _WIN32 && defined __GNUC__ && !defined __OpenBSD__ && !(defined __APPLE__ && defined __BIG_ENDIAN__) && !defined GEKKO && !defined EDUKE32_TOUCH_DEVICES && !defined __OPENDINGUX__ && !defined __PSP__
 # define PRINTSTACKONSEGV 1
 # include <execinfo.h>
 #endif
@@ -406,8 +409,8 @@ int WINAPI WinMain(HINSTANCE hInst, HINSTANCE hPrevInst, LPSTR lpCmdLine, int nC
 extern "C" int eduke32_android_main(int argc, char const *argv[]);
 # endif
 int eduke32_android_main(int argc, char const *argv[])
-#elif defined GEKKO
-int SDL_main(int argc, char *argv[])
+#elif defined GEKKO || defined __PSP__
+extern "C" int SDL_main(int argc, char *argv[])
 #else
 int main(int argc, char *argv[])
 #endif
@@ -1784,7 +1787,11 @@ void videoShowFrame(int32_t w)
     }
 
     if (SDL_MUSTLOCK(sdl_surface)) SDL_LockSurface(sdl_surface);
+#ifdef __PSP__
+    softsurface_blitBuffer((uint32_t*) sdl_surface->pixels, sdl_surface->format->BitsPerPixel, /*sdl_surface->pitch*/512);
+#else
     softsurface_blitBuffer((uint32_t*) sdl_surface->pixels, sdl_surface->format->BitsPerPixel);
+#endif
     if (SDL_MUSTLOCK(sdl_surface)) SDL_UnlockSurface(sdl_surface);
 
     if (SDL_UpdateWindowSurface(sdl_window))
@@ -1900,7 +1907,7 @@ int32_t videoSetGamma(void)
     return i;
 }
 
-#if !defined __APPLE__ && !defined EDUKE32_TOUCH_DEVICES
+#if !defined __APPLE__ && !defined EDUKE32_TOUCH_DEVICES && !defined __PSP__
 extern "C" struct sdlappicon sdlappicon;
 static inline SDL_Surface *loadappicon(void)
 {

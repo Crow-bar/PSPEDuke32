@@ -68,7 +68,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 # define UPDATEINTERVAL 604800 // 1w
 # include "winbits.h"
 #else
-# ifndef GEKKO
+# if !defined(GEKKO) && !defined(__PSP__)
 #  include <sys/ioctl.h>
 # endif
 #endif /* _WIN32 */
@@ -99,10 +99,13 @@ int32_t g_Shareware = 0;
 // This was 32 for a while, but I think lowering it to 24 will help things like the Dingoo.
 // Ideally, we would look at our memory usage on our most cramped platform and figure out
 // how much of that is needed for the underlying OS and things like SDL instead of guessing
-#ifndef GEKKO
-int32_t MAXCACHE1DSIZE = (96*1024*1024);
-#else
+#if defined(GEKKO)
 int32_t MAXCACHE1DSIZE = (8*1024*1024);
+#elif defined(__PSP__)
+int32_t MAXCACHE1DSIZE = (10*1024*1024);
+#else
+int32_t MAXCACHE1DSIZE = (96*1024*1024);
+
 #endif
 
 int32_t tempwallptr;
@@ -6703,7 +6706,7 @@ MAIN_LOOP_RESTART:
             char ch;
             static uint32_t bufpos = 0;
             static char buf[128];
-#ifndef GEKKO
+#if !defined(GEKKO) && !defined(__PSP__)
             int32_t flag = 1;
             ioctl(0, FIONBIO, &flag);
 #endif

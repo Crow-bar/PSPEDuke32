@@ -1,6 +1,8 @@
 
-#ifdef RENDERTYPEWIN
+#if defined(RENDERTYPEWIN)
 # include "winlayer.h"
+#elif defined(RENDERTYPEPSP)
+# include "psplayer.h"
 #else
 # include "sdlayer.h"
 #endif

@@ -198,7 +198,7 @@ void CONFIG_SetDefaults(void)
     ud.config.MixRate = 48000;
 #endif
 
-#if defined GEKKO || defined __OPENDINGUX__
+#if defined GEKKO || defined __OPENDINGUX__ || defined __PSP__
     ud.config.NumVoices = 32;
     ud.camera_time = 11;
 #else
@@ -206,7 +206,7 @@ void CONFIG_SetDefaults(void)
     ud.camera_time    = 4;
 #endif
 
-#ifdef GEKKO
+#if defined GEKKO || defined __PSP__
     ud.setup.usejoystick = 1;
 #else
     ud.setup.usejoystick = 0;

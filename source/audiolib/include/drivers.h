@@ -30,6 +30,8 @@ typedef enum
     ASS_DirectSound,
 #elif defined MIXERTYPESDL
     ASS_SDL,
+#elif defined MIXERTYPEPSP
+    ASS_PSP,
 #endif
     ASS_NumSoundCards,
 } soundcardnames;
